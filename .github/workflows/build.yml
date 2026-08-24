@@ -1,0 +1,37 @@
+name: Build AX6000 clean firmware
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ax6000-openwrt-build
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    steps:
+      - name: Check out build recipe
+        uses: actions/checkout@v4
+
+      - name: Install build prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential clang flex bison g++ gawk gcc-multilib g++-multilib \
+            gettext git libncurses5-dev libssl-dev python3-setuptools rsync swig unzip file wget zstd
+
+      - name: Build and validate firmware
+        run: bash scripts/build.sh
+
+      - name: Publish firmware artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ax6000-openwrt-24.10-clean-sysupgrade
+          path: firmware/
+          if-no-files-found: error
+          retention-days: 14
+
