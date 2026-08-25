@@ -27,7 +27,7 @@
 
 ## 刷写前的安全要求
 
-- 本镜像使用 `xiaomi_redmi-router-ax6000-stock` 布局，只适用于普通官方分区布局的红米 AX6000。
-- 不保留当前配置刷写；PPPoE、Wi-Fi、PassWall2 和 AdGuard Home 均应在新系统中重新设置。
+- 本镜像使用官方 stock layout 分区，并额外提供与当前 BleachWrt `xiaomi_redmi-router-ax6000` 标识兼容的 sysupgrade 元数据；仅适用于普通官方分区布局的红米 AX6000。
+- 从当前 BleachWrt 迁移时可保留配置，以保留 PPPoE、Wi-Fi 和 LAN 设置；刷写完成后应检查并重新整理 PassWall2、AdGuard Home 的旧配置。
 - 刷写前先从 LuCI 导出当前配置备份，且保留可用的回退固件。
 - 仅在 `.manifest` 同时包含 `luci-app-passwall2`、`adguardhome`、`dnsmasq-full`、`firewall4`、`sing-box` 和 `xray-core` 时才使用该构建产物。
