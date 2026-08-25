@@ -7,6 +7,7 @@ openwrt_tag="${OPENWRT_TAG:-v24.10.8}"
 
 git clone --depth 1 --branch "$openwrt_tag" https://github.com/openwrt/openwrt.git "$source_dir"
 cd "$source_dir"
+patch -p1 < "$project_root/patches/100-ax6000-bleachwrt-compatible-board.patch"
 cp "$project_root/config/feeds.conf" feeds.conf.default
 
 ./scripts/feeds update -a
@@ -30,8 +31,8 @@ make download -j"$(nproc)"
 make -j"$(nproc)" V=s
 
 target_dir="bin/targets/mediatek/filogic"
-image="$(find "$target_dir" -maxdepth 1 -type f -name '*xiaomi_redmi-router-ax6000-stock-squashfs-sysupgrade.bin' -print -quit)"
-manifest="$(find "$target_dir" -maxdepth 1 -type f -name '*xiaomi_redmi-router-ax6000-stock.manifest' -print -quit)"
+image="$(find "$target_dir" -maxdepth 1 -type f -name '*xiaomi_redmi-router-ax6000-squashfs-sysupgrade.bin' -print -quit)"
+manifest="$(find "$target_dir" -maxdepth 1 -type f -name '*xiaomi_redmi-router-ax6000.manifest' -print -quit)"
 
 if [ -z "$image" ] || [ ! -f "$image" ]; then
   echo "Expected AX6000 sysupgrade image was not created." >&2
