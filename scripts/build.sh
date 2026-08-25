@@ -35,7 +35,7 @@ manifest="${image%.bin}.manifest"
 test -n "$image"
 test -f "$manifest"
 
-for package in adguardhome dnsmasq-full firewall4 luci-app-passwall2 nftables sing-box xray-core; do
+for package in adguardhome dnsmasq-full firewall4 luci-app-passwall2 nftables-json sing-box xray-core; do
   grep -q "^${package} " "$manifest"
 done
 
@@ -43,4 +43,3 @@ output_dir="$project_root/firmware"
 mkdir -p "$output_dir"
 cp "$image" "$manifest" "$output_dir/"
 sha256sum "$output_dir/$(basename "$image")" > "$output_dir/$(basename "$image").sha256"
-
