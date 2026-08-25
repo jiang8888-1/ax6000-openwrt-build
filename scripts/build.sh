@@ -31,12 +31,25 @@ make -j"$(nproc)" V=s
 
 target_dir="bin/targets/mediatek/filogic"
 image="$(find "$target_dir" -maxdepth 1 -type f -name '*xiaomi_redmi-router-ax6000-stock-squashfs-sysupgrade.bin' -print -quit)"
-manifest="${image%.bin}.manifest"
-test -n "$image"
-test -f "$manifest"
+manifest="$(find "$target_dir" -maxdepth 1 -type f -name '*xiaomi_redmi-router-ax6000-stock.manifest' -print -quit)"
+
+if [ -z "$image" ] || [ ! -f "$image" ]; then
+  echo "Expected AX6000 sysupgrade image was not created." >&2
+  find "$target_dir" -maxdepth 1 -type f -printf '%f\n' >&2
+  exit 1
+fi
+
+if [ -z "$manifest" ] || [ ! -f "$manifest" ]; then
+  echo "Expected AX6000 package manifest was not created." >&2
+  find "$target_dir" -maxdepth 1 -type f -name '*.manifest' -printf '%f\n' >&2
+  exit 1
+fi
 
 for package in adguardhome dnsmasq-full firewall4 luci-app-passwall2 nftables-json sing-box xray-core; do
-  grep -q "^${package} " "$manifest"
+  if ! grep -q "^${package} " "$manifest"; then
+    echo "Required package is missing from the image: ${package}" >&2
+    exit 1
+  fi
 done
 
 output_dir="$project_root/firmware"
