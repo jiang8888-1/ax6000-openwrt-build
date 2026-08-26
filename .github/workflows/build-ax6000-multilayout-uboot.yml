@@ -1,0 +1,30 @@
+name: Build AX6000 multi-layout U-Boot
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build verified AX6000 FIP
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu build-essential flex bison libssl-dev device-tree-compiler qemu-user-static
+          git clone --depth 1 https://github.com/hanwckf/bl-mt798x.git "$RUNNER_TEMP/bl-mt798x"
+          cd "$RUNNER_TEMP/bl-mt798x"
+          SOC=mt7986 BOARD=redmi_ax6000 MULTI_LAYOUT=1 ./build.sh
+          mkdir -p "$GITHUB_WORKSPACE/ax6000-multilayout-uboot"
+          cp output/mt7986_redmi_ax6000-fip-fixed-parts-multi-layout.bin "$GITHUB_WORKSPACE/ax6000-multilayout-uboot/"
+          sha256sum "$GITHUB_WORKSPACE"/ax6000-multilayout-uboot/* > "$GITHUB_WORKSPACE/ax6000-multilayout-uboot/sha256sums.txt"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ax6000-multilayout-uboot
+          path: ax6000-multilayout-uboot/
+          if-no-files-found: error
+          retention-days: 14
